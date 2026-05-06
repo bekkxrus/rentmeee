@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/Badge";
 import { Gallery } from "@/components/Gallery";
 import { getCarDetails } from "@/lib/data";
-import { formatCurrency } from "@/lib/utils";
+import { firstSearchParam, formatCurrency } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -12,14 +12,22 @@ type CarDetailsPageProps = {
   params: {
     id: string;
   };
+  searchParams: Record<string, string | string[] | undefined>;
 };
 
-export default async function CarDetailsPage({ params }: CarDetailsPageProps) {
+export default async function CarDetailsPage({ params, searchParams }: CarDetailsPageProps) {
   const car = await getCarDetails(params.id);
 
   if (!car) {
     notFound();
   }
+
+  const checkoutHref = buildCheckoutHref(car.id, {
+    pickupLocation: firstSearchParam(searchParams.pickupLocation),
+    returnLocation: firstSearchParam(searchParams.returnLocation),
+    pickupDate: firstSearchParam(searchParams.pickupDate),
+    returnDate: firstSearchParam(searchParams.returnDate),
+  });
 
   return (
     <main className="bg-white">
@@ -67,7 +75,7 @@ export default async function CarDetailsPage({ params }: CarDetailsPageProps) {
             </div>
 
             <Link
-              href={`/checkout?id=${car.id}`}
+              href={checkoutHref}
               className="btn-primary w-full justify-center py-4 text-base"
             >
               Continue to checkout
@@ -120,4 +128,16 @@ function PriceStat({ label, value }: { label: string; value: string }) {
       <p className="mt-2 text-xl font-black text-zinc-950">{value}</p>
     </div>
   );
+}
+
+function buildCheckoutHref(carId: string, params: Record<string, string | undefined>) {
+  const urlParams = new URLSearchParams({ id: carId });
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value) {
+      urlParams.set(key, value);
+    }
+  });
+
+  return `/checkout?${urlParams.toString()}`;
 }

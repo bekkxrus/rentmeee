@@ -13,11 +13,12 @@ type CarCardProps = {
 
 export function CarCard({ car, priority = false, checkoutParams }: CarCardProps) {
   const image = car.primaryImage;
+  const detailHref = buildHref(`/cars/${car.id}`, checkoutParams);
   const checkoutHref = buildCheckoutHref(car.id, checkoutParams);
 
   return (
     <article className="group overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-      <Link href={`/cars/${car.id}`} className="block">
+      <Link href={detailHref} className="block">
         <div className="relative aspect-[4/3] overflow-hidden bg-zinc-100">
           {image?.image_url ? (
             <Image
@@ -43,7 +44,7 @@ export function CarCard({ car, priority = false, checkoutParams }: CarCardProps)
               {car.category}
             </p>
             <h3 className="mt-1 text-xl font-black text-zinc-950">
-              <Link href={`/cars/${car.id}`}>{car.name}</Link>
+              <Link href={detailHref}>{car.name}</Link>
             </h3>
           </div>
           <div className="text-right">
@@ -74,13 +75,17 @@ export function CarCard({ car, priority = false, checkoutParams }: CarCardProps)
 }
 
 function buildCheckoutHref(carId: string, checkoutParams?: Record<string, string | undefined>) {
-  const params = new URLSearchParams({ id: carId });
+  return buildHref("/checkout", { id: carId, ...checkoutParams });
+}
 
-  Object.entries(checkoutParams ?? {}).forEach(([key, value]) => {
+function buildHref(path: string, paramsObject?: Record<string, string | undefined>) {
+  const params = new URLSearchParams();
+
+  Object.entries(paramsObject ?? {}).forEach(([key, value]) => {
     if (value) {
       params.set(key, value);
     }
   });
 
-  return `/checkout?${params.toString()}`;
+  return params.toString() ? `${path}?${params.toString()}` : path;
 }
