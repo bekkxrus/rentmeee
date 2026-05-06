@@ -8,22 +8,8 @@ import type {
   Review,
 } from "@/lib/types";
 
-const carColumns = `
-  id,
-  name,
-  description,
-  price_per_day,
-  weekly_rate,
-  monthly_rate,
-  ride_share_enabled,
-  status,
-  deposit,
-  unlimited_miles,
-  category
-`;
-
 const carWithPrimaryImageSelect = `
-  ${carColumns},
+  *,
   car_images!inner (
     id,
     car_id,
@@ -33,7 +19,7 @@ const carWithPrimaryImageSelect = `
 `;
 
 const carWithDetailsSelect = `
-  ${carColumns},
+  *,
   car_images (
     id,
     car_id,
@@ -95,10 +81,6 @@ export async function getCars(filters: CarFilters = {}): Promise<CarWithPrimaryI
     .eq("car_images.is_primary", true)
     .order("price_per_day", { ascending: true });
 
-  if (filters.category) {
-    query = query.eq("category", filters.category);
-  }
-
   if (typeof filters.minPrice === "number") {
     query = query.gte("price_per_day", filters.minPrice);
   }
@@ -117,7 +99,13 @@ export async function getCars(filters: CarFilters = {}): Promise<CarWithPrimaryI
     throw new Error(`Unable to load cars: ${error.message}`);
   }
 
-  return normalizeCarsWithPrimaryImage(data);
+  const cars = normalizeCarsWithPrimaryImage(data);
+
+  if (filters.category) {
+    return cars.filter((car) => car.category === filters.category);
+  }
+
+  return cars;
 }
 
 export async function getCarDetails(id: string): Promise<CarDetails | null> {
