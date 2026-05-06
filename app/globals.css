@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-zinc-50 text-zinc-950 antialiased;
+}
+
+@layer components {
+  .container-page {
+    @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+  }
+
+  .section {
+    @apply py-16 md:py-20;
+  }
+
+  .eyebrow,
+  .section-eyebrow {
+    @apply text-xs font-black uppercase tracking-[0.25em] text-yellow-600;
+  }
+
+  .field {
+    @apply h-12 w-full rounded-2xl border border-zinc-200 bg-white px-4 text-base text-zinc-950 outline-none transition placeholder:text-zinc-400 focus:border-yellow-400 focus:ring-4 focus:ring-yellow-100;
+  }
+
+  .btn-primary {
+    @apply inline-flex h-12 items-center justify-center rounded-2xl bg-yellow-400 px-6 text-sm font-black uppercase tracking-wide text-zinc-950 transition hover:bg-yellow-300;
+  }
+
+  .btn-secondary {
+    @apply inline-flex h-12 items-center justify-center rounded-2xl border border-zinc-200 bg-white px-6 text-sm font-black uppercase tracking-wide text-zinc-950 transition hover:border-yellow-400 hover:bg-yellow-50;
+  }
+}
